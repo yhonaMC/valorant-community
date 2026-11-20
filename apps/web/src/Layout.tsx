@@ -46,7 +46,10 @@ export function Layout() {
         </nav>
       </header>
       <main className={styles.main}>
-        <Outlet />
+        {/* La clave reinicia la animación de entrada en cada cambio de pantalla (login, mapa, volver). */}
+        <div key={location.pathname} className={styles.screen}>
+          <Outlet />
+        </div>
       </main>
       <ScrollRestoration />
     </>

@@ -63,6 +63,24 @@
   padding-bottom: 64px;
 }
 
+/* Entrada de pantalla: aparece y sube 12px. Sin relleno final, para no dejar un transform
+   permanente en el contenedor. Con movimiento reducido, base.css la deja en 0,01ms. */
+.screen {
+  animation: screen-in 380ms var(--ease-out);
+}
+
+@keyframes screen-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+/* El área de cuenta (email y «Salir») cambia al iniciar sesión: que también aparezca suave. */
+.account > * {
+  animation: screen-in 380ms var(--ease-out);
+}
+
 /* A 360 px el email no cabe junto a la marca: queda solo «Salir». */
 @media (max-width: 479px) {
   .email {
