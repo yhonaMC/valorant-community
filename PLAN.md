@@ -90,6 +90,8 @@ Todo lo que no sirva a estos seis pasos es recortable.
 | **Cookie HttpOnly** | Se mantiene | El token nunca es legible desde JS; con front y API bajo el mismo origen no hace falta CORS. |
 | Paquete compartido de tipos (`packages/shared`) | **No se crea** | Añade configuración de build entre paquetes. El contrato vive en §3.5; el front declara sus tipos en un único archivo `api/types.ts`. Se añadiría si el contrato creciera. |
 
+**Versiones (decidido en H1):** npm ya publica NestJS 12, Prisma 7/8, TypeScript 7 y Vite 8, pero se fijan las líneas estables anteriores (NestJS 11, Prisma 6, TypeScript 5.9, Vite 7, React Router 7). Motivo: las mayores nuevas cambian la configuración (Prisma 7 exige adaptadores y `prisma.config.ts`; TypeScript 7 es la reescritura nativa) y no hay margen en una jornada para validar esos cambios. pnpm 11 bloquea los scripts de instalación: solo se permiten los de Prisma y esbuild (`allowBuilds` en `pnpm-workspace.yaml`), y se respeta su protección contra versiones recién publicadas (React Query fijado en 5.107.1).
+
 Cambios respecto a la propuesta: ninguno de fondo. Se precisan tres puntos:
 
 - **Mismo origen en Docker y en desarrollo.** En Docker, nginx (`web`) sirve el build y hace proxy de `/api` a `api`. En desarrollo, el proxy de Vite hace lo mismo. Problema que resuelve: elimina CORS y hace que la cookie funcione igual en ambos entornos.
@@ -270,7 +272,9 @@ Diseño:
 
 **Uso de Impeccable previsto en la implementación (formas verificadas en su README, pendientes de ejecutar):**
 
-Decisiones ya tomadas sobre la instalación (se aplican en H1, en un commit propio):
+**Resultado real de la instalación (H1):** `npx impeccable install --providers=claude --scope=project --no-hooks` falló porque descarga desde `impeccable.style`, que no resuelve por DNS en esta máquina; no instaló nada. Se aplicó la alternativa documentada en su README: copia manual de `.claude/skills/impeccable` desde GitHub (commit `b49177d`, skill 4.10.0), sin su `.claude/settings.json` (que contiene los hooks) y sin los subagentes del modo `live`. `impeccable telemetry status` confirma la telemetría desactivada por `.impeccable/config.json`; `impeccable doctor` no detecta problemas. El motor se descarga de las releases de GitHub y se verifica contra los checksums incluidos.
+
+Decisiones tomadas sobre la instalación (aplicadas en H1, en un commit propio):
 
 - **Alcance:** solo Claude Code y solo este proyecto. Comando previsto: `npx impeccable install --providers=claude --scope=project` desde la raíz.
 - **Hook automático: rechazado.** Si el instalador lo ofrece, se responde que no. No está verificado que exista una opción de línea de comandos para omitirlo; si la instalación no interactiva lo activara, se retira antes del commit y se comprueba que `.claude/settings.json` no contiene hooks de Impeccable.
@@ -654,6 +658,8 @@ Limitaciones de la IA encontradas en esta fase, para contarlas con honestidad:
 - La herramienta de lectura web no pudo abrir varias referencias visuales (DNS o dominios bloqueados) ni renderizar páginas; las referencias 1, 2 y 4 se observaron solo como marcado. VCT, la BBC y la ficha deportiva las revisé yo en el navegador y decidí qué adaptar de cada una; por eso §4.2 separa lo que observó la IA de lo que revisé yo.
 - Un primer resumen automático de la API dejó datos sin confirmar (número de armas, cuerpo del 404, soporte de `es-ES`); se resolvió consultando la API directamente.
 - La respuesta de armas pesa ~3,6 MB: una integración ingenua la habría reenviado al navegador. De ahí la regla de recortar en el backend.
+
+| H0–H1 | Claude Code (modelo Claude Opus 5.5), orquestador sin subagentes | Repositorio, esqueleto del monorepo, Docker, esquema y migración, instalación de Impeccable | Estructura de §3.2, Dockerfiles, esquema Prisma | Se fijaron versiones estables anteriores en vez de las últimas mayores; se rechazó la excepción automática de pnpm a su protección de versiones nuevas; se añadió `*.cmd eol=crlf` tras ver que `eol=lf` rompería el lanzador de Impeccable en Windows | `docker compose up --build`: `/api/health` → 200 a través de nginx, rutas de la SPA → 200, tablas creadas por la migración; `pnpm -r build` sin errores; `impeccable telemetry status` y `doctor` |
 
 Filas siguientes: una por hito, según la regla 9 de §9.3.
 
