@@ -1,0 +1,165 @@
+.page {
+  padding: 40px var(--gutter) 0;
+}
+
+.intro {
+  margin-bottom: 32px;
+}
+
+.title {
+  font-size: clamp(3rem, 9vw, 6rem);
+}
+
+.lede {
+  max-width: 60ch;
+  margin: 12px 0 0;
+  color: var(--text-muted);
+}
+
+.grid {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  min-width: 0;
+}
+
+.link {
+  position: relative;
+  display: block;
+  border-radius: var(--radius);
+  text-decoration: none;
+}
+
+/* Marco con proporción fija: reserva el espacio antes de que llegue la imagen.
+   Si la imagen falla, queda el color de superficie y el nombre en texto (§3.6). */
+.frame {
+  overflow: hidden;
+  aspect-ratio: 3 / 1;
+  border-radius: var(--radius);
+  background: var(--surface-1);
+}
+
+/* Recorte central: el motivo del arte está centrado (§5.4). */
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 200ms var(--ease-out);
+}
+
+/* Velo oscuro solo bajo el rótulo, para su legibilidad. Único degradado permitido (§5.2). */
+.label {
+  position: absolute;
+  inset: auto 0 0;
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  padding: 32px 16px 12px;
+  border-radius: 0 0 var(--radius) var(--radius);
+  background: linear-gradient(to top, rgb(15 25 35 / 0.88), rgb(15 25 35 / 0));
+  pointer-events: none;
+}
+
+.name {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+
+.enter {
+  font-weight: 600;
+  font-size: 0.9375rem;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition:
+    opacity 200ms var(--ease-out),
+    transform 200ms var(--ease-out);
+}
+
+/* Animación nº 3 (§7): mismo efecto con ratón y con teclado. */
+.link:hover .image,
+.link:focus-visible .image {
+  transform: scale(1.04);
+}
+
+.link:hover .enter,
+.link:focus-visible .enter {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .link:hover .image,
+  .link:focus-visible .image {
+    transform: none;
+  }
+}
+
+@media (min-width: 720px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .frame {
+    aspect-ratio: 16 / 9;
+  }
+
+  .label {
+    padding: 64px 24px 20px;
+  }
+
+  .name {
+    font-size: clamp(2.5rem, 4.5vw, 3.75rem);
+  }
+
+  /* El primero a ancho completo rompe la rejilla uniforme. A 21:9 para que
+     no ocupe toda la pantalla (a 16:9 y 1280 px mediría ~700 px de alto). */
+  .item:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .item:first-child .frame {
+    aspect-ratio: 21 / 9;
+  }
+
+  .item:first-child .label {
+    padding: 96px 32px 28px;
+  }
+
+  .item:first-child .name {
+    font-size: clamp(3.5rem, 8vw, 6rem);
+  }
+}
+
+.error {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  max-width: 60ch;
+  padding: 20px;
+  border: 1px solid var(--error);
+  border-radius: var(--radius);
+  background: var(--surface-1);
+}
+
+.errorText {
+  display: flex;
+  gap: 12px;
+  margin: 0;
+}
+
+.errorIcon {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--error);
+}
