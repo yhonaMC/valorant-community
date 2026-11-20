@@ -57,6 +57,12 @@
   white-space: nowrap;
 }
 
+/* Tu fila fuera del top 5: separada del resto por una línea discontinua. */
+.detached {
+  padding-top: 10px;
+  border-top: 1px dashed var(--surface-2);
+}
+
 .row[data-mine] .label {
   font-weight: 600;
 }

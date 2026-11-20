@@ -61,7 +61,6 @@ export function OptionPicker({ labelledBy, layout, options, confirmed, pending, 
           decoding="async"
         />
         <span className={styles.name}>{o.name}</span>
-        {layout === 'rows' && <span className={styles.detail}>{o.detail}</span>}
         {state === 'confirmed' && <CheckIcon className={styles.check} size={14} />}
         {state === 'pending' && <span className="visually-hidden">, guardando</span>}
       </button>

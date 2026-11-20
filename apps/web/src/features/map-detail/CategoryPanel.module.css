@@ -3,7 +3,6 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  min-height: 210px;
 }
 
 .skeleton,
@@ -40,16 +39,10 @@
 }
 
 .login {
-  align-self: flex-start;
   display: inline-flex;
   align-items: center;
   min-height: 44px;
   font-weight: 600;
-}
-
-.none {
-  margin: 0;
-  color: var(--text-muted);
 }
 
 .card,
@@ -59,10 +52,9 @@
   gap: 20px;
 }
 
-/* Busto: el retrato de cuerpo entero (2048×1860, mucho aire) se amplía y se
-   ancla arriba para encuadrar cabeza y hombros en 120×160. */
+/* Ficha: el rostro del agente (icon, cuadrado, ya en caché por la rejilla) recortado
+   a 3:4, como una foto de ficha deportiva: cabeza y hombros. */
 .bust {
-  position: relative;
   flex-shrink: 0;
   overflow: hidden;
   width: 120px;
@@ -73,13 +65,10 @@
 }
 
 .bust img {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  width: 330%;
-  max-width: none;
-  height: auto;
-  translate: -50% 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
 }
 
 .silhouette {
@@ -87,6 +76,21 @@
   width: 120px;
   height: 32px;
   object-fit: contain;
+}
+
+/* Hueco sin voto: misma forma que la ficha, contorno discontinuo y sin acento. */
+.empty {
+  border: 2px dashed var(--surface-2);
+  border-radius: var(--radius);
+  background: transparent;
+}
+
+.weaponCard .empty {
+  height: 48px;
+}
+
+.choiceEmpty {
+  color: var(--text-muted);
 }
 
 .choice {
@@ -122,6 +126,25 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.pickHead {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 24px;
+}
+
+/* En escritorio, la cabecera con el estado sigue a la vista al recorrer la rejilla. */
+@media (min-width: 960px) {
+  .pickHead {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    padding: 10px 0;
+    margin: -10px 0;
+    background: var(--surface-0);
+  }
 }
 
 .pickTitle {

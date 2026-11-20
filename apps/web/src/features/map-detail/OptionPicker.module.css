@@ -95,10 +95,10 @@
   font-weight: 600;
 }
 
-/* Armas: silueta a la izquierda, nombre y categoría. */
+/* Armas: silueta a la izquierda y nombre (la categoría ya es el título del grupo). */
 .rows .option {
   display: grid;
-  grid-template-columns: 88px minmax(0, 1fr) auto;
+  grid-template-columns: 88px minmax(0, 1fr);
   align-items: center;
   gap: 12px;
   padding: 6px 32px 6px 10px;
@@ -112,11 +112,6 @@
 
 .rows .name {
   font-weight: 600;
-}
-
-.detail {
-  color: var(--text-muted);
-  font-size: 0.8125rem;
 }
 
 .rows .check {
@@ -135,7 +130,7 @@
   }
 
   .rows .option {
-    grid-template-columns: 120px minmax(0, 1fr) auto;
+    grid-template-columns: 120px minmax(0, 1fr);
   }
 
   .rows .image {

@@ -20,16 +20,20 @@ const percent = (count: number, total: number) => (total ? Math.round((count / t
 // Clasificación con escala común: cada barra es count/total sobre una pista del 100 %.
 // Animación 2 (§7): con resultados nuevos, las barras van al ancho nuevo en el orden
 // anterior; al terminar (450 ms) cambian a la vez recuentos, porcentajes, total y orden.
-export function Ranking({ results, mine, nameOf, mapName, restLabel, headingId }: Props) {
-  const [shown, setShown] = useState(results);
+export function Ranking({ results, mine: latestMine, nameOf, mapName, restLabel, headingId }: Props) {
+  // La marca «tu voto» cambia junto con los recuentos, no antes: durante la transición
+  // nunca se muestra (ni se anuncia) una combinación que no existió.
+  const [view, setView] = useState({ results, mine: latestMine });
   const [expanded, setExpanded] = useState(false);
+  const shown = view.results;
+  const mine = view.mine;
 
   useEffect(() => {
-    if (results === shown) return;
+    if (results === view.results && latestMine === view.mine) return;
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const t = setTimeout(() => setShown(results), reduced ? 0 : BAR_MS);
+    const t = setTimeout(() => setView({ results, mine: latestMine }), reduced || results === view.results ? 0 : BAR_MS);
     return () => clearTimeout(t);
-  }, [results, shown]);
+  }, [results, latestMine, view]);
 
   const sorted = (r: CategoryResults) =>
     r.counts
@@ -42,7 +46,14 @@ export function Ranking({ results, mine, nameOf, mapName, restLabel, headingId }
   const added = sorted(results).filter((r) => !known.has(r.optionId));
   const latest = new Map(results.counts.map((c) => [c.optionId, c.count]));
   const rows = [...base, ...added.map((r) => ({ ...r, isNew: true }))];
-  const hidden = rows.length - VISIBLE;
+  // Tu fila se ve siempre: si queda por debajo del corte, se añade separada.
+  const mineIndex = rows.findIndex((r) => r.optionId === mine);
+  const hidden = rows.length - VISIBLE - (mineIndex >= VISIBLE ? 1 : 0);
+  const visible = expanded
+    ? rows
+    : mineIndex >= VISIBLE
+      ? [...rows.slice(0, VISIBLE), rows[mineIndex]]
+      : rows.slice(0, VISIBLE);
   const total = added.length && !shown.total ? results.total : shown.total;
 
   return (
@@ -55,12 +66,17 @@ export function Ranking({ results, mine, nameOf, mapName, restLabel, headingId }
       ) : (
         <>
           <ol className={styles.list} aria-labelledby={headingId}>
-            {rows.slice(0, expanded ? undefined : VISIBLE).map((r) => {
+            {visible.map((r, i) => {
               const isMine = r.optionId === mine;
               const pct = percent(r.count, r.total);
               const scale = results.total ? (latest.get(r.optionId) ?? 0) / results.total : 0;
+              const detached = !expanded && i === VISIBLE; // tu fila, separada del top 5
               return (
-                <li key={r.optionId} className={styles.row} data-mine={isMine || undefined}>
+                <li
+                  key={r.optionId}
+                  className={detached ? `${styles.row} ${styles.detached}` : styles.row}
+                  data-mine={isMine || undefined}
+                >
                   <span className="visually-hidden">
                     {`${r.name}, ${votes(r.count)}, ${pct} por ciento${isMine ? ', tu voto' : ''}`}
                   </span>
@@ -82,7 +98,7 @@ export function Ranking({ results, mine, nameOf, mapName, restLabel, headingId }
               );
             })}
           </ol>
-          {hidden > 0 && (
+          {(hidden > 0 || expanded) && (
             <button type="button" className={styles.more} aria-expanded={expanded} onClick={() => setExpanded(!expanded)}>
               {expanded ? 'Ver menos' : restLabel(hidden)}
             </button>

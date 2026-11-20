@@ -32,6 +32,7 @@ export function CategoryPanel({ category, mapId, mapName, options, results, vote
   const visitor = results?.myVotes === null;
   const confirmed = results?.myVotes?.[category] ?? null;
   const pending = vote.isPending ? vote.variables : null;
+  const status = vote.isPending ? 'saving' : vote.isSuccess ? 'saved' : null;
 
   function select(optionId: string) {
     if (!results || vote.isPending) return;
@@ -47,7 +48,7 @@ export function CategoryPanel({ category, mapId, mapName, options, results, vote
             category={category}
             option={confirmed ? (options.find((o) => o.id === confirmed) ?? unknownOption(confirmed)) : null}
             visitor={visitor}
-            status={vote.isPending ? 'saving' : vote.isSuccess ? 'saved' : null}
+            mapName={mapName}
             accessHref={accessHref}
           />
         ) : (
@@ -72,9 +73,14 @@ export function CategoryPanel({ category, mapId, mapName, options, results, vote
       )}
 
       <div className={styles.picker}>
-        <h3 className={styles.pickTitle} id={`${id}-pick`}>
-          {label.pick}
-        </h3>
+        {/* El estado del guardado va junto a la acción; en escritorio esta cabecera
+            queda fija mientras se recorre la rejilla (crítica de Impeccable, P1). */}
+        <div className={styles.pickHead}>
+          <h3 className={styles.pickTitle} id={`${id}-pick`}>
+            {label.pick}
+          </h3>
+          <SaveStatus status={status} />
+        </div>
         {vote.isError && (
           <VoteError
             error={vote.error}
@@ -102,46 +108,51 @@ export function unknownOption(id: string): Option {
   return { id, name: 'Opción desconocida', detail: '', icon: '' };
 }
 
+// Ficha «Tu voto». Sin voto se muestra el hueco vacío con la misma forma, de modo que
+// la rejilla no salta al confirmar el primer voto.
 function MyVote({
   category,
   option,
   visitor,
-  status,
+  mapName,
   accessHref,
 }: {
   category: Category;
   option: Option | null;
   visitor: boolean;
-  status: 'saving' | 'saved' | null;
+  mapName: string;
   accessHref: string;
 }) {
+  const agent = category === 'agent';
   return (
     <div className={styles.myVote}>
-      <p className={styles.myVoteHead}>
-        <span>Tu voto</span>
-        <SaveStatus status={status} />
-      </p>
-      {visitor ? (
-        <Link to={accessHref} className={styles.login}>
-          Inicia sesión para votar
-        </Link>
-      ) : !option ? (
-        <p className={styles.none}>Todavía no has votado en este mapa.</p>
-      ) : (
-        <div className={category === 'agent' ? styles.card : styles.weaponCard}>
-          {category === 'agent' ? (
-            <div className={styles.bust}>
-              {option.portrait && <img src={option.portrait} alt="" width={2048} height={1860} />}
-            </div>
-          ) : (
-            option.icon && <img className={styles.silhouette} src={option.icon} alt="" width={120} height={32} />
-          )}
-          <div>
-            <p className={styles.choice}>{option.name}</p>
-            {option.detail && <p className={styles.detail}>{option.detail}</p>}
+      <p className={styles.myVoteHead}>Tu voto</p>
+      <div className={agent ? styles.card : styles.weaponCard}>
+        {agent ? (
+          // Rostro (icon), ya cargado en la rejilla: nunca muestra al agente anterior.
+          <div className={option ? styles.bust : `${styles.bust} ${styles.empty}`}>
+            {option?.icon && <img key={option.id} src={option.icon} alt="" width={1024} height={1024} />}
           </div>
+        ) : option?.icon ? (
+          <img key={option.id} className={styles.silhouette} src={option.icon} alt="" width={120} height={32} />
+        ) : (
+          <div className={`${styles.silhouette} ${styles.empty}`} />
+        )}
+        <div>
+          <p className={option ? styles.choice : `${styles.choice} ${styles.choiceEmpty}`}>
+            {option ? option.name : 'Sin voto'}
+          </p>
+          {visitor ? (
+            <Link to={accessHref} className={styles.login}>
+              Inicia sesión para votar
+            </Link>
+          ) : (
+            <p className={styles.detail}>
+              {option ? option.detail : `Aún no has votado ${agent ? 'agente' : 'arma'} en ${mapName}.`}
+            </p>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }
