@@ -2,6 +2,7 @@ import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Prisma } from '@prisma/client';
 import { randomBytes, scrypt, timingSafeEqual } from 'node:crypto';
+import { Resolver } from 'node:dns/promises';
 import { promisify } from 'node:util';
 import type { Request } from 'express';
 import { PrismaService } from '../prisma.service';
@@ -29,6 +30,20 @@ async function verifyPassword(password: string, stored: string) {
   return timingSafeEqual(actual, expected);
 }
 
+// El dominio del email debe existir y aceptar correo (registro MX que no sea el «MX nulo» de RFC 7505).
+// Si el DNS no responde (sin red, timeout) no se bloquea el registro: solo se rechaza lo que el DNS niega.
+// ponytail: no comprueba que exista el buzón; eso exige enviar un correo de verificación.
+const resolver = new Resolver({ timeout: 3000, tries: 1 });
+async function domainAcceptsMail(email: string) {
+  try {
+    const mx = await resolver.resolveMx(email.slice(email.lastIndexOf('@') + 1));
+    return mx.some((r) => r.exchange !== '' && r.exchange !== '.');
+  } catch (e) {
+    const code = (e as NodeJS.ErrnoException).code;
+    return code !== 'ENOTFOUND' && code !== 'ENODATA';
+  }
+}
+
 // Hash de relleno para que un email inexistente tarde lo mismo que uno existente.
 const DUMMY_HASH = hashPassword('dummy-password');
 
@@ -40,6 +55,10 @@ export class AuthService {
   ) {}
 
   async register(email: string, password: string): Promise<SessionUser> {
+    if (!(await domainAcceptsMail(email))) {
+      const msg = 'Ese dominio de correo no existe o no recibe emails';
+      throw new ApiError(400, 'Datos no válidos', { email: msg });
+    }
     try {
       const user = await this.prisma.user.create({
         data: { email, passwordHash: await hashPassword(password) },

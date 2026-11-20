@@ -61,6 +61,7 @@ Los errores siempre tienen la forma `{ statusCode, message, fields? }`, en espa�
 ## Autenticación y protección de escrituras
 
 - Contraseñas con `crypto.scrypt` de Node (sal aleatoria, comparación en tiempo constante). Un email inexistente también calcula un hash, para no revelar por tiempos qué emails existen.
+- Al registrarse, además del formato, se comprueba en el DNS que el dominio del email existe y tiene un registro MX válido (rechaza `@dominio-inventado.com` y dominios con «MX nulo», como `example.com`). Si el DNS no responde, no bloquea el registro. No comprueba que el buzón exista: eso exigiría enviar un correo de verificación.
 - Sesión: JWT de 7 días en la cookie `vc_session` con `HttpOnly` (no la lee JavaScript), `SameSite=Lax` y `Secure` cuando `COOKIE_SECURE=true`.
 - Escrituras protegidas por tres capas: `SameSite=Lax` (el navegador no envía la cookie en un POST/PUT desde otro sitio), un guard que rechaza con 403 un `Origin` no incluido en `APP_ORIGIN`, y solo `application/json` (415 en otro caso), que impide formularios HTML entre sitios. Con mismo origen y estas capas, un token CSRF no aportaba nada más.
 - Límites conocidos: no hay revocación de sesiones en el servidor ni límite de intentos.
@@ -86,6 +87,6 @@ npm ya publica NestJS 12, Prisma 7/8, TypeScript 7 y Vite 8, pero se fijaron las
 
 ## Verificación
 
-- 26 pruebas e2e de la API (`pnpm test:api`).
+- 27 pruebas e2e de la API (`pnpm test:api`).
 - Recorrido completo en Chrome headless, en escritorio y en móvil: visitante → acceso → vuelta al mapa, voto con teclado, voto repetido, cambio de voto, error del servidor con Reintentar, recarga, movimiento reducido y sin scroll horizontal a 360 px.
 - Revisión de diseño y técnica con Impeccable (`critique` y `audit`); hallazgos y decisiones en `PLAN.md` (hito H6) y capturas en `docs/capturas/`.

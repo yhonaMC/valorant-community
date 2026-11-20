@@ -47,7 +47,7 @@ La prueba se desarrolló con IA de principio a fin, con un reparto explícito: y
 - **Audit (14/20).** La página de un mapa descargaba 15 MB, de ellos 12 de rostros de agentes. Pasó a 4,1 MB en escritorio y 3,5 MB en móvil, medido antes y después.
 
 **Validación:**
-- 26 pruebas e2e.
+- 27 pruebas e2e.
 - Reejecución de todo lo que entregaban los agentes.
 - Persistencia comprobada reiniciando y recreando contenedores.
 - Recorrido completo en un navegador real tras cada corrección.

@@ -653,7 +653,7 @@ H5 (Agente Web, con la API ya real) → revisor → H6 → H7 (orquestador y yo)
 
 - [x] Clon limpio + `.env` desde el ejemplo + `docker compose up --build --wait` funciona sin pasos ocultos (también con `build --no-cache`, 20-11-2026)
 - [x] Recorrido de §2 completo en ese entorno (Chrome headless, base vacía)
-- [x] Pruebas e2e de la API en verde: 26/26 (`pnpm test:api`)
+- [x] Pruebas e2e de la API en verde: 27/27 (`pnpm test:api`)
 - [x] Persistencia tras reiniciar los contenedores y tras recrear la API
 - [x] Revisión en escritorio y móvil, teclado y movimiento reducido
 - [x] Revisión con Impeccable registrada (tabla de H6)

@@ -1,5 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import { Resolver } from 'node:dns/promises';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { PrismaService } from '../src/prisma.service';
@@ -80,7 +81,20 @@ export function mockValorantApi(mode: 'ok' | 'fail' = 'ok') {
   });
 }
 
+// Sustituye el DNS del registro: todo dominio tiene MX salvo estos casos fijos.
+export const DNS_CASES = { noExiste: 'no-existe.invalid', mxNulo: 'sin-correo.dev', caido: 'dns-caido.dev' };
+function mockDns() {
+  return jest.spyOn(Resolver.prototype, 'resolveMx').mockImplementation(async (domain: string) => {
+    const fail = (code: string) => Object.assign(new Error(code), { code });
+    if (domain === DNS_CASES.noExiste) throw fail('ENOTFOUND');
+    if (domain === DNS_CASES.caido) throw fail('ETIMEOUT');
+    if (domain === DNS_CASES.mxNulo) return [{ exchange: '', priority: 0 }];
+    return [{ exchange: `mx.${domain}`, priority: 10 }];
+  });
+}
+
 export async function createApp() {
+  mockDns();
   const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
   const app = moduleRef.createNestApplication({ logger: false });
   setupApp(app);

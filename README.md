@@ -66,7 +66,7 @@ Pruebas e2e de la API (necesitan PostgreSQL en marcha):
 pnpm test:api
 ```
 
-Usan una base de datos aparte (`valorant_test`), que crean y migran ellas mismas; no tocan los datos de la aplicación. Sustituyen Valorant API por respuestas fijas, así que no dependen de la red. Cubren el registro y el login, la cookie, la protección de escrituras, el voto duplicado y concurrente, el cambio de voto, la agregación por mapa, los identificadores inválidos y la caída de Valorant API.
+Usan una base de datos aparte (`valorant_test`), que crean y migran ellas mismas; no tocan los datos de la aplicación. Sustituyen Valorant API por respuestas fijas, así que no dependen de la red. Cubren el registro y el login (incluido el rechazo de dominios de email sin correo), la cookie, la protección de escrituras, el voto duplicado y concurrente, el cambio de voto, la agregación por mapa, los identificadores inválidos y la caída de Valorant API.
 
 ## Estructura
 
@@ -92,6 +92,7 @@ La documentación técnica está en [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 
 - Revocación de sesiones en el servidor: cerrar sesión borra la cookie, pero un token copiado sigue siendo válido hasta que caduca (7 días).
 - Límite de intentos de inicio de sesión.
+- Verificación del email por correo. El registro comprueba el formato y que el dominio exista y reciba correo (registro MX), pero no que el buzón exista.
 - Retirar un voto.
 - Agrupar los agentes por rol en el selector.
 - Conservar el agente que eligió un visitante después de iniciar sesión (vuelve al mapa, pero tiene que elegirlo de nuevo).

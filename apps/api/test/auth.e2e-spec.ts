@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { PrismaService } from '../src/prisma.service';
-import { createApp, mockValorantApi, resetDb, signUp } from './helpers';
+import { createApp, DNS_CASES, mockValorantApi, resetDb, signUp } from './helpers';
 
 describe('Auth y protección de escrituras (H2)', () => {
   let app: INestApplication;
@@ -37,6 +37,15 @@ describe('Auth y protección de escrituras (H2)', () => {
     const user = await app.get(PrismaService).user.findUniqueOrThrow({ where: { email: 'a@b.co' } });
     expect(user.passwordHash).toMatch(/^[0-9a-f]{32}:[0-9a-f]{128}$/);
     expect(user.passwordHash).not.toContain('mi-clave-123');
+  });
+
+  it('dominio sin correo (no existe o MX nulo) → 400 fields.email; DNS caído no bloquea', async () => {
+    for (const domain of [DNS_CASES.noExiste, DNS_CASES.mxNulo]) {
+      const res = await register({ email: `ana@${domain}`, password: '12345678' }).expect(400);
+      expect(res.body.fields).toEqual({ email: 'Ese dominio de correo no existe o no recibe emails' });
+    }
+    expect(await app.get(PrismaService).user.count()).toBe(0);
+    await register({ email: `ana@${DNS_CASES.caido}`, password: '12345678' }).expect(201);
   });
 
   it('email duplicado (aunque cambien mayúsculas) → 409 con fields.email', async () => {
