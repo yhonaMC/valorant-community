@@ -651,16 +651,16 @@ H5 (Agente Web, con la API ya real) → revisor → H6 → H7 (orquestador y yo)
 
 ## 10. Lista de comprobación de entrega (todo pendiente)
 
-- [ ] Clon limpio + `.env` desde el ejemplo + `docker compose up --build` funciona sin pasos ocultos
-- [ ] Recorrido de §2 completo en ese entorno
-- [ ] Pruebas e2e de la API en verde (comando documentado en el README)
-- [ ] Persistencia tras reiniciar los contenedores
-- [ ] Revisión en escritorio y móvil, teclado y movimiento reducido
-- [ ] Revisión con Impeccable registrada (tabla de H6)
-- [ ] `README.md`, `docs/ARCHITECTURE.md`, `docs/AI.md`
-- [ ] `.env.example` sin secretos; `.env` ignorado
-- [ ] Historial Git legible por hitos
-- [ ] Sección «No implementado» escrita
+- [x] Clon limpio + `.env` desde el ejemplo + `docker compose up --build --wait` funciona sin pasos ocultos (también con `build --no-cache`, 20-11-2026)
+- [x] Recorrido de §2 completo en ese entorno (Chrome headless, base vacía)
+- [x] Pruebas e2e de la API en verde: 26/26 (`pnpm test:api`)
+- [x] Persistencia tras reiniciar los contenedores y tras recrear la API
+- [x] Revisión en escritorio y móvil, teclado y movimiento reducido
+- [x] Revisión con Impeccable registrada (tabla de H6)
+- [x] `README.md`, `docs/ARCHITECTURE.md`, `docs/AI.md`, `docs/capturas/`
+- [x] `.env.example` sin secretos; `.env` ignorado
+- [x] Historial Git legible por hitos
+- [x] Sección «No implementado» escrita
 - [ ] Enlace enviado (público) o invitación a `german@lucidbot.co` + confirmación (privado), antes del sábado 14:00 (hora de Colombia)
 
 ---
@@ -686,7 +686,7 @@ Limitaciones de la IA encontradas en esta fase, para contarlas con honestidad:
 | H5 | Agente Web | Pantalla de detalle con los seis estados y las animaciones 1 y 2 | Componentes, estados y animación de barras | — (revisado por la crítica) | Recorrido completo en Chrome headless: visitante → acceso → vuelta, voto con teclado, repetido, cambio, error 500 inyectado y Reintentar, recarga, movimiento reducido, 360 px |
 | H6 | Impeccable (`critique` con dos subagentes, `audit`) y orquestador | Revisión de diseño y técnica del flujo de votar y cambiar el voto | Ver la tabla de H6 | Ver la tabla de H6; la decisión de qué corregir fue del autor | Mismo recorrido repetido tras cada corrección; bytes y nombres cortados medidos antes y después |
 
-Filas siguientes: una por hito, según la regla 9 de §9.3.
+| H7 | Orquestador | README, documentación técnica, registro de IA y prueba de arranque limpio | Redacción de `docs/ARCHITECTURE.md` y `docs/AI.md` (pendiente de mi revisión antes de la entrega) | — | Clon nuevo sin `.env`, `cp .env.example .env`, `docker compose up --build --wait` y `build --no-cache`; recorrido completo en el navegador contra ese clon |
 
 ---
 
