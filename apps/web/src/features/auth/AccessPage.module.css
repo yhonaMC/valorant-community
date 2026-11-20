@@ -1,6 +1,13 @@
-/* Formulario estrecho alineado a la izquierda, sobre fondo plano (§5.5). */
+/* Formulario estrecho centrado en el espacio bajo la cabecera, sobre fondo plano.
+   Alto disponible = ventana − cabecera (65px) − relleno inferior de <main> (64px). */
 .page {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   max-width: calc(26rem + 2 * var(--gutter));
+  min-height: calc(100svh - 65px - 64px);
+  margin-inline: auto;
+  padding-bottom: 48px;
 }
 
 .title {
