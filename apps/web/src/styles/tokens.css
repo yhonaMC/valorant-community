@@ -1,0 +1,18 @@
+/* Paleta y tipografía (PLAN.md §5.2 y §5.3). Cada color tiene una sola función. */
+:root {
+  --surface-0: #0f1923; /* fondo de página */
+  --surface-1: #1a2632; /* paneles y filas */
+  --surface-2: #263443; /* hover, pista de las barras */
+  --text: #ece8e1; /* texto principal */
+  --text-muted: #9aa7b2; /* texto secundario */
+  --accent: #ff4655; /* SOLO elección confirmada y acción principal */
+  --focus: #ece8e1; /* anillo de foco */
+  --error: #ffb224; /* errores, siempre con icono y texto */
+
+  --font-display: 'Anton', 'Oswald', sans-serif;
+  --font-body: 'IBM Plex Sans', system-ui, sans-serif;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --radius: 4px;
+  --gutter: clamp(16px, 4vw, 40px);
+}

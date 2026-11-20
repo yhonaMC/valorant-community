@@ -1,0 +1,37 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Category {
+  AGENT
+  WEAPON
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique // normalizado a minúsculas
+  passwordHash String // scrypt: "salt:hash" en hex
+  createdAt    DateTime @default(now())
+  votes        Vote[]
+}
+
+// Un voto es una fila que se sobrescribe, no un evento que se acumula.
+// La restricción única garantiza un solo voto por usuario, mapa y categoría,
+// también ante peticiones repetidas o concurrentes.
+model Vote {
+  id        String   @id @default(uuid())
+  userId    String
+  mapId     String // uuid de Valorant API
+  category  Category
+  optionId  String // uuid de agente o arma en Valorant API
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, mapId, category])
+  @@index([mapId, category, optionId])
+}

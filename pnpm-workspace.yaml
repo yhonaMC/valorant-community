@@ -1,0 +1,11 @@
+packages:
+  - apps/*
+
+# pnpm bloquea los scripts de instalación por defecto. Solo se permiten los necesarios:
+# Prisma (motores y cliente generado) y esbuild (lo usa Vite).
+allowBuilds:
+  '@parcel/watcher': false
+  '@prisma/client': true
+  '@prisma/engines': true
+  esbuild: true
+  prisma: true
