@@ -1,7 +1,7 @@
 /* Agentes: 5 rostros por fila en móvil, 6 en escritorio (§5.4). */
 .faces {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 6px;
 }
 
@@ -75,15 +75,15 @@
   gap: 4px;
 }
 
+/* killfeedPortrait es 256×128: se muestra entero, sin recortarlo a cuadrado. */
 .faces .image {
   width: 100%;
-  max-width: 56px;
+  max-width: 128px;
   height: auto;
-  aspect-ratio: 1;
-  object-fit: cover;
+  aspect-ratio: 2;
 }
 
-/* En móvil (5 columnas) un punto menos, para que «Brimstone» o «Deadlock» no se corten. */
+/* En móvil (4 columnas) un punto menos, para que «Brimstone» o «Deadlock» no se corten. */
 .faces .name {
   max-width: 100%;
   overflow: hidden;
@@ -130,10 +130,6 @@
 @media (min-width: 960px) {
   .faces {
     grid-template-columns: repeat(6, minmax(0, 1fr));
-  }
-
-  .faces .image {
-    max-width: 72px;
   }
 
   .faces .name {

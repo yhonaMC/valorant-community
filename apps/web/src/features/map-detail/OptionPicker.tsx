@@ -55,8 +55,8 @@ export function OptionPicker({ labelledBy, layout, options, confirmed, pending, 
           className={styles.image}
           src={o.icon}
           alt=""
-          width={layout === 'faces' ? 72 : 120}
-          height={layout === 'faces' ? 72 : 32}
+          width={layout === 'faces' ? 128 : 120}
+          height={layout === 'faces' ? 64 : 32}
           loading="lazy"
           decoding="async"
         />
