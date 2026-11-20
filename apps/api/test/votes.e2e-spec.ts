@@ -51,8 +51,8 @@ describe('Catálogo y votos (H3)', () => {
         id: SAGE,
         name: 'Sage',
         role: 'Centinela',
-        icon: `https://media.valorant-api.com/agents/${SAGE}/displayicon.png`,
-        portrait: `https://media.valorant-api.com/agents/${SAGE}/fullportrait.png`,
+        icon: `https://media.valorant-api.com/agents/${SAGE}/killfeedportrait.png`,
+        portrait: `https://media.valorant-api.com/agents/${SAGE}/displayicon.png`,
       });
 
       // Sin cuerpo a cuerpo; por categoría (orden de la tienda) y coste.

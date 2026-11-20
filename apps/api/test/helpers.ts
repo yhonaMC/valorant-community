@@ -37,6 +37,7 @@ const rawAgent = (uuid: string, displayName: string, role: string) => ({
   displayName,
   description: 'Descripción larga',
   displayIcon: media('agents', uuid, 'displayicon'),
+  killfeedPortrait: media('agents', uuid, 'killfeedportrait'),
   fullPortrait: media('agents', uuid, 'fullportrait'),
   isPlayableCharacter: true,
   role: { uuid: 'x', displayName: role, description: 'rol' },

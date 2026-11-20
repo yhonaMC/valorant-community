@@ -107,8 +107,11 @@ export class CatalogService implements OnApplicationBootstrap {
           id: a.uuid,
           name: a.displayName,
           role: a.role?.displayName,
-          icon: a.displayIcon,
-          portrait: a.fullPortrait,
+          // icon: rostro ligero (killfeedPortrait, 256×128, ~28 KB) para la rejilla de 30.
+          // portrait: rostro grande (displayIcon, 1024×1024) solo para la ficha «Tu voto».
+          // Con displayIcon en la rejilla, la página descargaba 12 MB (audit de Impeccable).
+          icon: a.killfeedPortrait,
+          portrait: a.displayIcon,
         }))
         .sort(byName),
       // Sin shopData = cuerpo a cuerpo.

@@ -83,12 +83,19 @@
   object-fit: cover;
 }
 
+/* En móvil (5 columnas) un punto menos, para que «Brimstone» o «Deadlock» no se corten. */
 .faces .name {
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
+}
+
+@media (max-width: 959px) {
+  .faces .option {
+    padding: 6px 2px;
+  }
 }
 
 .faces [data-state='confirmed'] .name {
@@ -127,6 +134,10 @@
 
   .faces .image {
     max-width: 72px;
+  }
+
+  .faces .name {
+    font-size: 0.75rem;
   }
 
   .rows .option {

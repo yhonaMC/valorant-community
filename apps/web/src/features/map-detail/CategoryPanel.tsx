@@ -36,8 +36,11 @@ export function CategoryPanel({ category, mapId, mapName, options, results, vote
 
   function select(optionId: string) {
     if (!results || vote.isPending) return;
-    if (visitor) navigate(accessHref);
-    else vote.mutate(optionId);
+    if (visitor) return navigate(accessHref);
+    // Precarga el rostro grande de la ficha mientras se guarda el voto.
+    const portrait = options.find((o) => o.id === optionId)?.portrait;
+    if (portrait) new Image().src = portrait;
+    vote.mutate(optionId);
   }
 
   return (
@@ -129,9 +132,10 @@ function MyVote({
       <p className={styles.myVoteHead}>Tu voto</p>
       <div className={agent ? styles.card : styles.weaponCard}>
         {agent ? (
-          // Rostro (icon), ya cargado en la rejilla: nunca muestra al agente anterior.
+          // Rostro grande (portrait), precargado al votar. La key evita reutilizar la
+          // imagen anterior: nunca se ve el agente previo junto al nombre nuevo.
           <div className={option ? styles.bust : `${styles.bust} ${styles.empty}`}>
-            {option?.icon && <img key={option.id} src={option.icon} alt="" width={1024} height={1024} />}
+            {option?.portrait && <img key={option.id} src={option.portrait} alt="" width={1024} height={1024} />}
           </div>
         ) : option?.icon ? (
           <img key={option.id} className={styles.silhouette} src={option.icon} alt="" width={120} height={32} />
