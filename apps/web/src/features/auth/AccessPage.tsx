@@ -6,7 +6,7 @@ import { setSession, useCatalog, useSession } from '../../api/queries';
 import type { User } from '../../api/types';
 import styles from './AccessPage.module.css';
 import { safeReturn } from './safeReturn';
-import { ErrorIcon } from '../../ErrorIcon';
+import { ErrorIcon } from '../../Icons';
 
 type Mode = 'login' | 'register';
 

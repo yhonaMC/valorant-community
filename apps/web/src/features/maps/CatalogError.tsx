@@ -1,4 +1,4 @@
-import { ErrorIcon } from '../../ErrorIcon';
+import { ErrorIcon } from '../../Icons';
 import styles from './MapsPage.module.css';
 
 // Mensaje de §3.6 cuando no hay catálogo. Lo usan la exploración y el detalle.

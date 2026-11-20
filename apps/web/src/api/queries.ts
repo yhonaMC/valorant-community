@@ -1,6 +1,6 @@
 import { useQuery, type QueryClient } from '@tanstack/react-query';
 import { api, ApiRequestError } from './client';
-import type { Catalog, User } from './types';
+import type { Catalog, MapResults, User } from './types';
 
 // Sesión actual: 401 no es un error, es «sin sesión» (null).
 export function useSession() {
@@ -24,6 +24,14 @@ export function useSession() {
 export function setSession(queryClient: QueryClient, user: User | null) {
   queryClient.setQueryData(['session'], user);
   queryClient.invalidateQueries({ queryKey: ['results'] });
+}
+
+export function useResults(mapId: string) {
+  return useQuery({
+    queryKey: ['results', mapId],
+    queryFn: () => api<MapResults>(`/maps/${mapId}/results`),
+    retry: 1,
+  });
 }
 
 // El catálogo cambia con los parches del juego, no durante una visita: caché de 1 h.

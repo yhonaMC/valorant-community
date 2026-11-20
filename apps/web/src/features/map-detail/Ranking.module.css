@@ -1,0 +1,132 @@
+.ranking {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.heading {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+  line-height: 1.5;
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+.empty {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Móvil: nombre arriba, barra y cifras debajo (§5.5). */
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'name name'
+    'track num';
+  align-items: center;
+  column-gap: 12px;
+  row-gap: 4px;
+}
+
+.name {
+  grid-area: name;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.row[data-mine] .label {
+  font-weight: 600;
+}
+
+.dot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.tag {
+  flex-shrink: 0;
+  color: var(--accent);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.track {
+  grid-area: track;
+  overflow: hidden;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--surface-2);
+}
+
+/* Ancho fijo y scaleX: la barra se anima sin reflujo (§7). */
+.bar {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--text-muted);
+  transform-origin: left;
+  transition: transform 450ms var(--ease-out);
+}
+
+.row[data-mine] .bar {
+  background: var(--accent);
+}
+
+/* Una opción que recibe su primer voto crece desde 0. */
+@starting-style {
+  .entering {
+    transform: scaleX(0) !important;
+  }
+}
+
+.row .num {
+  grid-area: num;
+  min-width: 9ch;
+  text-align: right;
+  font-size: 0.9375rem;
+}
+
+.more {
+  align-self: flex-start;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+
+@media (min-width: 960px) {
+  .row {
+    grid-template-columns: minmax(0, 9rem) minmax(0, 1fr) auto;
+    grid-template-areas: 'name track num';
+  }
+}

@@ -1,0 +1,145 @@
+/* Agentes: 5 rostros por fila en móvil, 6 en escritorio (§5.4). */
+.faces {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.groupName {
+  margin: 0 0 4px;
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+/* Casilla. Pendiente: contorno discontinuo en --text. Confirmada: contorno sólido
+   en --accent, fondo teñido y marca. Cada estado se distingue también por forma. */
+.option {
+  position: relative;
+  min-width: 0;
+  min-height: 44px;
+  padding: 6px;
+  border: 2px solid transparent;
+  border-radius: var(--radius);
+  background: var(--surface-1);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 120ms var(--ease-out),
+    background-color 120ms var(--ease-out);
+}
+
+.option:hover {
+  background: var(--surface-2);
+}
+
+.option[data-state='pending'] {
+  border-style: dashed;
+  border-color: var(--text);
+}
+
+.option[data-state='confirmed'] {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 16%, var(--surface-1));
+  transition-duration: 180ms;
+}
+
+[aria-busy='true'] > .option,
+[aria-busy='true'] .option {
+  cursor: progress;
+}
+
+.check {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  color: var(--accent);
+}
+
+.faces .option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.faces .image {
+  width: 100%;
+  max-width: 56px;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+.faces .name {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.75rem;
+}
+
+.faces [data-state='confirmed'] .name {
+  font-weight: 600;
+}
+
+/* Armas: silueta a la izquierda, nombre y categoría. */
+.rows .option {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 32px 6px 10px;
+}
+
+.rows .image {
+  width: 88px;
+  height: 28px;
+  object-fit: contain;
+}
+
+.rows .name {
+  font-weight: 600;
+}
+
+.detail {
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+}
+
+.rows .check {
+  top: 50%;
+  right: 10px;
+  translate: 0 -50%;
+}
+
+@media (min-width: 960px) {
+  .faces {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .faces .image {
+    max-width: 72px;
+  }
+
+  .rows .option {
+    grid-template-columns: 120px minmax(0, 1fr) auto;
+  }
+
+  .rows .image {
+    width: 120px;
+    height: 32px;
+  }
+}
