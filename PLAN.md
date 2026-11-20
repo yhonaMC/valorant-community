@@ -645,11 +645,11 @@ H5 (Agente Web, con la API ya real) → revisor → H6 → H7 (orquestador y yo)
 | El agente da por buenas pruebas que no ejecutó | Regla 4: salida real y segunda ejecución por el orquestador |
 | Sobreingeniería (capas, abstracciones, librerías extra) | Regla 8 y estructura cerrada de §3.2; el revisor busca también código sobrante |
 | Diseño genérico pese al plan | §5 como brief obligatorio del Agente Web; `critique` y `audit` de Impeccable en H6 |
-| No poder defender el código en la entrevista | Regla 6; `docs/ARCHITECTURE.md` lo redacto a partir de mis propias explicaciones |
+| Entregar código que no entiendo ni sé explicar | Regla 6; `docs/ARCHITECTURE.md` lo redacto a partir de mis propias explicaciones |
 
 ---
 
-## 10. Lista de comprobación de entrega (todo pendiente)
+## 10. Lista de comprobación de entrega
 
 - [x] Clon limpio + `.env` desde el ejemplo + `docker compose up --build --wait` funciona sin pasos ocultos (también con `build --no-cache`, 20-11-2026)
 - [x] Recorrido de §2 completo en ese entorno (Chrome headless, base vacía)
@@ -687,17 +687,3 @@ Limitaciones de la IA encontradas en esta fase, para contarlas con honestidad:
 | H6 | Impeccable (`critique` con dos subagentes, `audit`) y orquestador | Revisión de diseño y técnica del flujo de votar y cambiar el voto | Ver la tabla de H6 | Ver la tabla de H6; la decisión de qué corregir fue del autor | Mismo recorrido repetido tras cada corrección; bytes y nombres cortados medidos antes y después |
 
 | H7 | Orquestador | README, documentación técnica, registro de IA y prueba de arranque limpio | Redacción de `docs/ARCHITECTURE.md` y `docs/AI.md` (pendiente de mi revisión antes de la entrega) | — | Clon nuevo sin `.env`, `cp .env.example .env`, `docker compose up --build --wait` y `build --no-cache`; recorrido completo en el navegador contra ese clon |
-
----
-
-## 12. Decisiones que debo poder defender en la entrevista
-
-1. **Restricción única + upsert atómico:** la regla «un voto por usuario, mapa y categoría» vive en la base de datos, no en un `if`. Idempotencia y concurrencia resueltas con una sentencia.
-2. **Agregación con `GROUP BY` sobre votos reales, sin contadores:** imposible que los resultados se desincronicen; sé cuándo dejaría de bastar.
-3. **Cookie HttpOnly + mismo origen + SameSite + comprobación de `Origin`:** qué ataque cubre cada capa y por qué no añadí token CSRF.
-4. **No persistir el catálogo; validar los uuid contra una caché en memoria** que sigue sirviendo si la API externa cae.
-5. **Filtrar los mapas por `tacticalDescription`:** la API no marca los mapas competitivos; lo descubrí inspeccionando los datos y lo documenté como interpretación.
-6. **Lectura pública, escritura autenticada:** compatible con el enunciado y mejor para quien evalúa.
-7. **Selección inmediata pero recuentos solo confirmados por el servidor:** la interfaz nunca muestra un resultado que no existe.
-8. **Qué dejé fuera y por qué:** revocación de sesiones, límite de intentos, retirar voto, paquete compartido de tipos, librerías de UI y de animación.
-9. **Cómo dirigí a los agentes:** contrato primero, carriles con propiedad de carpetas, verificación con evidencia y revisión independiente.
