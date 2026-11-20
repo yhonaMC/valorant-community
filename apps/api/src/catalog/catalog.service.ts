@@ -9,8 +9,18 @@ export type Catalog = { maps: MapInfo[]; agents: Agent[]; weapons: Weapon[] };
 
 const BASE = 'https://valorant-api.com/v1/';
 const TTL_MS = 60 * 60 * 1000;
-// Orden del menú de compra del juego (shopData.category, sin traducir).
-const WEAPON_CATEGORY_ORDER = ['Pistols', 'SMGs', 'Shotguns', 'Rifles', 'Sniper Rifles', 'Heavy Weapons'];
+// Orden del menú de compra del juego (shopData.category, sin traducir) y su etiqueta.
+// No se usa shopData.categoryText: en es-ES, Warden dice «Rifles» y el resto de su
+// categoría «Rifles de asalto», y el selector lo agruparía aparte.
+const WEAPON_CATEGORIES: Record<string, string> = {
+  Pistols: 'Armas de mano',
+  SMGs: 'Subfusiles',
+  Shotguns: 'Escopetas',
+  Rifles: 'Rifles',
+  'Sniper Rifles': 'Francotirador',
+  'Heavy Weapons': 'Armas pesadas',
+};
+const WEAPON_CATEGORY_ORDER = Object.keys(WEAPON_CATEGORIES);
 
 const byName = (a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name, 'es');
 
@@ -106,7 +116,12 @@ export class CatalogService implements OnApplicationBootstrap {
           };
           return rank(a) - rank(b) || a.shopData.cost - b.shopData.cost || a.displayName.localeCompare(b.displayName);
         })
-        .map((w) => ({ id: w.uuid, name: w.displayName, category: w.shopData.categoryText, icon: w.displayIcon })),
+        .map((w) => ({
+          id: w.uuid,
+          name: w.displayName,
+          category: WEAPON_CATEGORIES[w.shopData.category] ?? w.shopData.categoryText,
+          icon: w.displayIcon,
+        })),
     };
   }
 }

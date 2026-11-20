@@ -60,7 +60,7 @@ describe('Catálogo y votos (H3)', () => {
       expect(weapons[1]).toEqual({
         id: VANDAL,
         name: 'Vandal',
-        category: 'Rifles de asalto',
+        category: 'Rifles', // etiqueta por categoría de tienda, no shopData.categoryText
         icon: `https://media.valorant-api.com/weapons/${VANDAL}/displayicon.png`,
       });
 
