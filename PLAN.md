@@ -236,6 +236,7 @@ Diseño:
 - **Servir obsoleto si falla la actualización:** si la API externa cae y hay catálogo en memoria, se sigue sirviendo. Solo si nunca se llegó a cargar se responde 503.
 - **Validación de identificadores:** al votar, `mapId` debe estar en `catalog.maps` (si no, 404) y `optionId` en `catalog.agents` o `catalog.weapons` según `category` (si no, 422). Así es imposible votar un arma como agente, un mapa no competitivo o un uuid inventado. La validación usa el catálogo en caché, no una llamada externa por voto.
 - **Qué necesita la interfaz** (y nada más): mapa → nombre, sitios, coordenadas, imagen grande (`splash`), miniatura (`listViewIcon`); agente → nombre, rol, `displayIcon`, `fullPortrait`; arma → nombre, categoría de tienda en español, `displayIcon`.
+  - **Cambiado en H6 (audit):** agente `icon` = `killfeedPortrait` (256×128, ~28 KB) y `portrait` = `displayIcon`; `fullPortrait` ya no se usa. La categoría de arma es una etiqueta propia por categoría de tienda, porque `categoryText` en español separaba a Warden del resto de rifles.
 - Las imágenes se enlazan directamente a `media.valorant-api.com` (no se copian al repositorio; el arte es de Riot).
 - **Qué ve el usuario si el servicio externo falla:**
   - Sin catálogo (503): pantalla de exploración con mensaje «No pudimos cargar los mapas de VALORANT. El servicio de datos del juego no responde.» y botón **Reintentar**. No se muestran tarjetas vacías ni datos inventados.
@@ -355,7 +356,7 @@ Prohibido en este proyecto (derivado de la lista de Impeccable y del encargo): e
 | Mapa en exploración | `splash` (pendiente comprobar peso y proporción en H3; alternativa `listViewIconTall`, 1920×1080 pero ~2 MB) | Bloque 16:9, `object-fit: cover` centrado; nombre en Anton abajo a la izquierda sobre velo oscuro | Franja 3:1 a ancho completo con recorte central (el motivo del arte está centrado); nombre superpuesto |
 | Mapa en cabecera de detalle | Misma imagen | Banda de ~280 px de alto a ancho completo, recorte central; rótulo grande + sitios y coordenadas en pequeño | Banda de ~160 px; solo rótulo |
 | Agente en selector | `displayIcon` (rostro, fondo transparente) | Casilla cuadrada de ~72 px sobre `--surface-1`, nombre debajo | Casilla de ~56 px; 5 por fila |
-| Agente elegido («tu voto») | `fullPortrait` | Recorte al busto: `object-fit: cover` con `object-position` hacia el tercio superior, en un panel de ~120×160 | Se sustituye por `displayIcon` de 64 px (el cuerpo entero no cabe con dignidad) |
+| Agente elegido («tu voto») | `displayIcon` (cambiado en H6: `fullPortrait` dejaba el cuerpo entero diminuto) | Rostro recortado a 120×160, cabeza y hombros | Resumen fijo con el rostro ligero a 40 px |
 | Arma | `displayIcon` (silueta apaisada) | Fila ancha: silueta a la izquierda (~120×32, `object-fit: contain`), nombre y categoría | Igual, silueta de ~88 px |
 
 - Imágenes con `loading="lazy"`, dimensiones reservadas (sin saltos de maquetación) y `alt` con el nombre.
@@ -550,9 +551,28 @@ Leyenda: **[I]** imprescindible · **[R]** recortable (en orden de recorte en §
 - **Tareas [I]:** revisión en escritorio (1280) y móvil (375); recorrido completo solo con teclado; emulación de `prefers-reduced-motion`; contrastes; capturas de las tres vistas; **revisión manual con Impeccable** en cuanto funcione la pantalla de detalle: `/impeccable critique` y `/impeccable audit` sobre el flujo de **votar y cambiar el voto**, en **escritorio y móvil**; decidir conmigo qué hallazgos se corrigen; aplicar esas correcciones.
 - **Registro de la revisión con Impeccable.** Solo hallazgos reales devueltos por la herramienta, sin resumir a favor ni completar con suposiciones; si una pasada no devuelve nada, se anota así. Hoy vacío a propósito:
 
+  **Cómo se hizo (20-11-2026).** El flujo con sesión se capturó con Chrome 157 headless controlado por DevTools Protocol (script fuera del repositorio), porque `impeccable shot` no puede iniciar sesión. `critique` se ejecutó con sus dos evaluaciones en subagentes aislados (A: revisión de diseño con su rúbrica; B: detector sobre el código y sobre la URL a 1280×800 y 390×844). `audit` se ejecutó con mediciones en el navegador (bytes descargados, objetivos táctiles, títulos, `alt`, nombres cortados) y cálculo de contrastes. Informes guardados por Impeccable en `.impeccable/critique/` y `.impeccable/audit/` (locales, no versionados).
+
+  **Resultados:** `critique` 29/40 (Good), 0 P0, 2 P1. Detector: 0 hallazgos (solo ve el estado de visitante). `audit` 14/20 (Good), 0 P0, 1 P1.
+
   | Comando | Dispositivo | Paso del flujo | Hallazgo | Gravedad | Decisión (corregir / descartar y por qué) | Commit |
   |---|---|---|---|---|---|---|
-  | — | — | — | — | — | — | — |
+  | critique | Escritorio | Votar | La rejilla queda bajo el pliegue tras un hueco vacío de 210 px; al votar no se ve el estado ni el resultado | P1 | **Corregido:** hueco «Sin voto» con su texto (sin salto al confirmar) y estado junto a «Elige agente/arma», cabecera fija en escritorio | `1055164` |
+  | critique | Ambos | Cambiar voto | Durante el cambio se ve el nombre del agente nuevo con el retrato del anterior | P1 | **Corregido:** la imagen se recrea por opción y se precarga al votar; la ficha usa el rostro (cabeza y hombros) | `1055164`, `39b86e4` |
+  | critique | Ambos | Ver resultados | Tu opción desaparece de la clasificación si queda 6.ª o más abajo | P2 | **Corregido:** tu fila se muestra siempre, separada del top 5 | `1055164` |
+  | critique | Ambos | Cambiar voto | Durante la animación se anuncia «Omen, 2 votos, tu voto», combinación que no existió | P2 | **Corregido:** la marca «tu voto» cambia junto con los recuentos | `1055164` |
+  | critique | Escritorio | Tras votar | «Todavía no has votado en este mapa» en Arma después de votar agente | P2 | **Corregido:** texto por categoría («Aún no has votado arma en Ascent.») | `1055164` |
+  | critique | Ambos | Elegir arma | Categoría repetida en cada fila y en la cabecera del grupo | P3 | **Corregido** | `1055164` |
+  | critique | Ambos | Error al guardar | El aviso desplaza la rejilla; un segundo clic puede votar otra casilla | P2 | **No se corrige** (decisión del autor tras la crítica): el grupo está bloqueado mientras guarda y el aviso aparece solo tras la respuesta | — |
+  | critique | Ambos | Visitante → acceso | Al volver del acceso se pierde la casilla elegida | P2 | **No implementado** (documentado): requiere llevar la elección en `?volver=` | — |
+  | critique | Ambos | Elegir agente | 30 agentes sin agrupar por rol | P2 | **No implementado** (documentado) | — |
+  | critique | — | Banda del mapa | Coordenadas con letras y «Sites A/B» en inglés | P3 | **Descartado:** son datos de Valorant API tal cual | — |
+  | (propio) | Escritorio | Ver resultados | «Ver los 0 restantes» cuando la única fila oculta es la tuya (introducido por la corrección anterior) | P2 | **Corregido** antes del commit | `1055164` |
+  | audit | Ambos | Cargar el mapa | 12,4 MB de rostros de agentes (30 PNG de 1024 px para 56–72 px); página de 15 MB | P1 | **Corregido:** `killfeedPortrait` (~28 KB) en rejilla y resumen; la página baja a 4,1 MB (escritorio) y 3,5 MB (móvil) | `39b86e4` |
+  | audit | Móvil | Elegir agente | Nombres truncados («Brimst…», «Deadlo…») | P2 | **Corregido:** medido 0 nombres cortados a 375 y 360 px | `39b86e4` |
+  | audit | Móvil | Cargar el mapa | La banda descarga el arte de 2,2 MB para 160 px | P2 | **Descartado** (límite conocido): la API no ofrece una variante intermedia y la franja ligera se vería borrosa | — |
+  | audit | Ambos | Movimiento reducido | Corte global de transiciones en `base.css` | P3 | **Descartado:** verificado que los estados se comunican por texto | — |
+  | audit | — | Theming | Velo con `rgb()` literal igual a `--surface-0` | P3 | **Descartado** | — |
 
 - **Verificación (pendiente):** las cuatro pasadas (critique y audit × escritorio y móvil) hechas y registradas; cada hallazgo tiene una decisión; capturas en `docs/capturas/`; ningún hallazgo grave abierto.
 
@@ -660,6 +680,11 @@ Limitaciones de la IA encontradas en esta fase, para contarlas con honestidad:
 - La respuesta de armas pesa ~3,6 MB: una integración ingenua la habría reenviado al navegador. De ahí la regla de recortar en el backend.
 
 | H0–H1 | Claude Code (modelo Claude Opus 5.5), orquestador sin subagentes | Repositorio, esqueleto del monorepo, Docker, esquema y migración, instalación de Impeccable | Estructura de §3.2, Dockerfiles, esquema Prisma | Se fijaron versiones estables anteriores en vez de las últimas mayores; se rechazó la excepción automática de pnpm a su protección de versiones nuevas; se añadió `*.cmd eol=crlf` tras ver que `eol=lf` rompería el lanzador de Impeccable en Windows | `docker compose up --build`: `/api/health` → 200 a través de nginx, rutas de la SPA → 200, tablas creadas por la migración; `pnpm -r build` sin errores; `impeccable telemetry status` y `doctor` |
+
+| H2–H4 | Dos subagentes en paralelo (Agente API y Agente Web) dirigidos por el orquestador | Auth, catálogo, votos y 22 pruebas e2e; router, sesión, acceso y exploración | Diseño del voto (`INSERT … ON CONFLICT`), caché del catálogo, pruebas en base aparte; estructura y estados del frontend; dos desviaciones visuales menores (bloque destacado 21:9, `alt=""` con nombre en texto) | El orquestador detectó al integrar que nginx devolvía 502 (API sin healthcheck y DNS fijado) y lo corrigió; normalizó la categoría de Warden | Reejecución de build y pruebas por el orquestador; `docker compose restart` y recreación de la API con el voto y la sesión conservados |
+| H3 (revisión) | Subagente revisor independiente, solo lectura | Revisión de seguridad y reglas de negocio de la API | Sin defectos graves; 5 de gravedad baja | Corregidos: arranque sin `APP_ORIGIN` y catálogo vacío que sustituía al bueno, más 4 pruebas (26 en total). Descartados con motivo: FK por usuario borrado (no hay ruta que borre), esperas con la API externa colgada | La prueba del catálogo vacío falla sin la corrección y pasa con ella |
+| H5 | Agente Web | Pantalla de detalle con los seis estados y las animaciones 1 y 2 | Componentes, estados y animación de barras | — (revisado por la crítica) | Recorrido completo en Chrome headless: visitante → acceso → vuelta, voto con teclado, repetido, cambio, error 500 inyectado y Reintentar, recarga, movimiento reducido, 360 px |
+| H6 | Impeccable (`critique` con dos subagentes, `audit`) y orquestador | Revisión de diseño y técnica del flujo de votar y cambiar el voto | Ver la tabla de H6 | Ver la tabla de H6; la decisión de qué corregir fue del autor | Mismo recorrido repetido tras cada corrección; bytes y nombres cortados medidos antes y después |
 
 Filas siguientes: una por hito, según la regla 9 de §9.3.
 
