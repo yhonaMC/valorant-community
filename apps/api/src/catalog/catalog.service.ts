@@ -69,6 +69,11 @@ export class CatalogService implements OnApplicationBootstrap {
   private refresh(): Promise<Catalog> {
     this.inFlight ??= this.download()
       .then((catalog) => {
+        // Si Valorant API cambia el formato, el filtrado puede dejar listas vacías:
+        // se trata como un fallo para no sustituir un catálogo bueno por uno vacío.
+        if (!catalog.maps.length || !catalog.agents.length || !catalog.weapons.length) {
+          throw new Error('Valorant API devolvió un catálogo incompleto');
+        }
         this.cache = catalog;
         this.loadedAt = Date.now();
         return catalog;

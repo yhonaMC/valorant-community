@@ -94,6 +94,8 @@ function validationError(errors: ValidationError[]) {
 // Configuración compartida por main.ts y las pruebas e2e,
 // para que las pruebas ejerciten exactamente la misma aplicación.
 export function setupApp(app: INestApplication) {
+  // Sin orígenes permitidos, toda escritura daría 403 sin pista de por qué: mejor no arrancar.
+  if (!process.env.APP_ORIGIN?.trim()) throw new Error('Falta la variable de entorno APP_ORIGIN');
   (app as NestExpressApplication).disable('x-powered-by');
   app.setGlobalPrefix('api');
   app.use(cookieParser());

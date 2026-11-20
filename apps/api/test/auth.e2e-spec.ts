@@ -118,6 +118,16 @@ describe('Auth y protección de escrituras (H2)', () => {
 });
 
 describe('Arranque', () => {
+  it('se niega a arrancar sin APP_ORIGIN', async () => {
+    const origin = process.env.APP_ORIGIN;
+    delete process.env.APP_ORIGIN;
+    try {
+      await expect(createApp()).rejects.toThrow('APP_ORIGIN');
+    } finally {
+      process.env.APP_ORIGIN = origin;
+    }
+  });
+
   it('se niega a arrancar sin JWT_SECRET', async () => {
     const secret = process.env.JWT_SECRET;
     delete process.env.JWT_SECRET;

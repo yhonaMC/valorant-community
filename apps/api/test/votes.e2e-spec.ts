@@ -121,6 +121,29 @@ describe('Catálogo y votos (H3)', () => {
       const res = await results(ASCENT).expect(200);
       expect(res.body.agent).toEqual({ total: 1, counts: [{ optionId: SAGE, count: 1 }] });
     });
+
+    it('Concurrencia con opciones distintas: Sage, Omen y Sova a la vez → 1 fila, gana una sola', async () => {
+      const me = await signUp(app);
+      const all = await Promise.all(
+        [SAGE, OMEN, SOVA, SAGE, OMEN, SOVA].map((id) => vote(me.cookie, ASCENT, 'agent', id)),
+      );
+      expect(all.map((r) => r.status)).toEqual(Array(6).fill(200));
+      expect(await app.get(PrismaService).vote.count({ where: { userId: me.id } })).toBe(1);
+      const res = await results(ASCENT, me.cookie).expect(200);
+      expect(res.body.agent.total).toBe(1);
+      expect(res.body.agent.counts).toEqual([{ optionId: res.body.myVotes.agent, count: 1 }]);
+    });
+  });
+
+  it('PUT de voto con cuerpo que no es JSON → 415, sin escribir', async () => {
+    const me = await signUp(app);
+    await http
+      .put(`/api/maps/${ASCENT}/votes/agent`)
+      .set('Cookie', me.cookie)
+      .type('form')
+      .send({ optionId: SAGE })
+      .expect(415);
+    expect(await app.get(PrismaService).vote.count()).toBe(0);
   });
 
   it('5. Agregación por mapa: tres usuarios, dos mapas; myVotes por usuario y null sin sesión', async () => {
@@ -258,5 +281,22 @@ describe('8. Fallo de Valorant API', () => {
     await http.get('/api/catalog').expect(200);
     const me = await signUp(app);
     await http.put(`/api/maps/${ASCENT}/votes/agent`).set('Cookie', me.cookie).send({ optionId: SAGE }).expect(200);
+  });
+
+  it('una respuesta con otro formato no sustituye la caché por un catálogo vacío', async () => {
+    const spy = mockValorantApi('ok');
+    app = await createApp();
+    http = request(app.getHttpServer());
+    await resetDb(app);
+    await http.get('/api/catalog').expect(200);
+
+    // La API externa responde 200 pero sin mapas competitivos (p. ej. un campo renombrado).
+    spy.mockImplementation(async () => new Response(JSON.stringify({ status: 200, data: [] })));
+    jest.spyOn(Date, 'now').mockReturnValue(Date.now() + 2 * 60 * 60 * 1000);
+    await http.get('/api/catalog').expect(200);
+    await new Promise((r) => setTimeout(r, 50)); // deja terminar la renovación en segundo plano
+
+    const res = await http.get('/api/catalog').expect(200);
+    expect(res.body.maps).toHaveLength(2);
   });
 });
