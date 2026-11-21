@@ -82,12 +82,26 @@ export function mockValorantApi(mode: 'ok' | 'fail' = 'ok') {
 }
 
 // Sustituye el DNS del registro: todo dominio tiene MX salvo estos casos fijos.
-export const DNS_CASES = { noExiste: 'no-existe.invalid', mxNulo: 'sin-correo.dev', caido: 'dns-caido.dev' };
+export const DNS_CASES = {
+  noExiste: 'no-existe.invalid',
+  mxNulo: 'sin-correo.dev',
+  caido: 'dns-caido.dev',
+  sinMx: 'solo-web.dev', // existe (tiene A) pero el DNS no devuelve MX
+  intermitente: 'intermitente.dev', // la primera consulta falla, como el DNS de Docker
+};
 function mockDns() {
-  return jest.spyOn(Resolver.prototype, 'resolveMx').mockImplementation(async (domain: string) => {
-    const fail = (code: string) => Object.assign(new Error(code), { code });
-    if (domain === DNS_CASES.noExiste) throw fail('ENOTFOUND');
+  const fail = (code: string) => Object.assign(new Error(code), { code });
+  let flaky = 0;
+  jest.spyOn(Resolver.prototype, 'resolve4').mockImplementation((async (domain: string) => {
+    if (domain === DNS_CASES.noExiste || domain === DNS_CASES.intermitente) throw fail('ENOTFOUND');
     if (domain === DNS_CASES.caido) throw fail('ETIMEOUT');
+    return ['192.0.2.1'];
+  }) as never);
+  return jest.spyOn(Resolver.prototype, 'resolveMx').mockImplementation(async (domain: string) => {
+    if (domain === DNS_CASES.noExiste) throw fail('ENOTFOUND');
+    if (domain === DNS_CASES.intermitente && flaky++ === 0) throw fail('ENOTFOUND');
+    if (domain === DNS_CASES.caido) throw fail('ETIMEOUT');
+    if (domain === DNS_CASES.sinMx) throw fail('ENODATA');
     if (domain === DNS_CASES.mxNulo) return [{ exchange: '', priority: 0 }];
     return [{ exchange: `mx.${domain}`, priority: 10 }];
   });

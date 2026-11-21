@@ -45,9 +45,10 @@ La prueba se desarrolló con IA de principio a fin, con un reparto explícito: y
 - **Revisión de la API.** Apliqué dos correcciones y cuatro pruebas nuevas. Una de ellas se comprobó retirando la corrección: falla sin ella y pasa con ella.
 - **Crítica de diseño (29/40).** Corregí la confirmación lejos del clic en escritorio, el retrato desfasado al cambiar de voto, tu fila oculta en la clasificación, la marca «tu voto» que se adelantaba a los recuentos y un texto incorrecto. Una corrección introdujo un fallo nuevo («Ver los 0 restantes»); se vio en la captura y se arregló antes del commit.
 - **Audit (14/20).** La página de un mapa descargaba 15 MB, de ellos 12 de rostros de agentes. Pasó a 4,1 MB en escritorio y 3,5 MB en móvil, medido antes y después.
+- **Validación del dominio del email.** La primera versión que generó la IA consultaba el registro MX y rechazaba el registro si el DNS no lo devolvía. Las pruebas pasaban porque simulaban el DNS. Al repetir el arranque desde un clon limpio, un registro con `@gmail.com` falló: el DNS interno de Docker falla de forma intermitente en la primera consulta, y unos 20 de 30 dominios reales habrían sido rechazados. Se cambió la regla (solo se rechaza un dominio que no existe tras tres intentos; ante la duda se acepta), se midió con 30 dominios reales (0 rechazos) y 3 inventados (3 rechazos), y se añadió una prueba del fallo intermitente.
 
 **Validación:**
-- 27 pruebas e2e.
+- 28 pruebas e2e.
 - Reejecución de todo lo que entregaban los agentes.
 - Persistencia comprobada reiniciando y recreando contenedores.
 - Recorrido completo en un navegador real tras cada corrección.

@@ -39,13 +39,18 @@ describe('Auth y protección de escrituras (H2)', () => {
     expect(user.passwordHash).not.toContain('mi-clave-123');
   });
 
-  it('dominio sin correo (no existe o MX nulo) → 400 fields.email; DNS caído no bloquea', async () => {
+  it('dominio que no existe o con MX nulo → 400 fields.email', async () => {
     for (const domain of [DNS_CASES.noExiste, DNS_CASES.mxNulo]) {
       const res = await register({ email: `ana@${domain}`, password: '12345678' }).expect(400);
       expect(res.body.fields).toEqual({ email: 'Ese dominio de correo no existe o no recibe emails' });
     }
     expect(await app.get(PrismaService).user.count()).toBe(0);
-    await register({ email: `ana@${DNS_CASES.caido}`, password: '12345678' }).expect(201);
+  });
+
+  it('DNS dudoso no bloquea: caído, sin MX pero con A, o fallo solo en la primera consulta → 201', async () => {
+    for (const domain of [DNS_CASES.caido, DNS_CASES.sinMx, DNS_CASES.intermitente]) {
+      await register({ email: `ana@${domain}`, password: '12345678' }).expect(201);
+    }
   });
 
   it('email duplicado (aunque cambien mayúsculas) → 409 con fields.email', async () => {

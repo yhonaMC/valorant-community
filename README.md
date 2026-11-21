@@ -38,7 +38,7 @@ Abre **<http://localhost:8080>**.
 | **Explorar** | Los 13 mapas de la rotación competitiva, con su arte, y una página de detalle por mapa. |
 | **Votar** | Con sesión: un agente y un arma por mapa, modificables por separado. Repetir el voto no suma; cambiarlo lo mueve. |
 | **Resultados** | Barras horizontales con conteo y porcentaje, y un total independiente para agentes y armas. Tu opción siempre aparece, aunque no esté entre las cinco primeras. |
-| **Cuentas** | Registro e inicio de sesión con email y contraseña. El email debe tener un formato válido y un dominio que reciba correo (registro MX). |
+| **Cuentas** | Registro e inicio de sesión con email y contraseña. El email debe tener un formato válido y un dominio que exista (se consulta el DNS). |
 | **Errores** | Si un voto no se guarda, el aviso dice qué voto sigue registrado y ofrece Reintentar. Si Valorant API cae, se sigue sirviendo la última copia del catálogo. |
 | **Accesibilidad** | Selección con teclado, foco visible, anuncios para lectores de pantalla y respeto a «reducir movimiento». Funciona desde 360 px de ancho. |
 
@@ -103,11 +103,11 @@ pnpm dev:web                       # web en http://localhost:5173 (proxy de /api
 Pruebas e2e de la API (necesitan PostgreSQL en marcha):
 
 ```bash
-pnpm test:api                      # 27 pruebas
+pnpm test:api                      # 28 pruebas
 ```
 
 Usan su propia base de datos (`valorant_test`), que crean y migran ellas mismas, y sustituyen Valorant API y el DNS por respuestas fijas: no tocan tus datos ni dependen de la red. Cubren:
-- registro y login, incluido el rechazo de dominios de email sin correo;
+- registro y login, incluido el rechazo de dominios de email que no existen;
 - la cookie de sesión y la protección de escrituras (`Origin` y `Content-Type`);
 - el voto repetido y 10 votos concurrentes, que dejan una sola fila;
 - el cambio de voto sin tocar la otra categoría ni otros mapas;
@@ -120,7 +120,7 @@ Usan su propia base de datos (`valorant_test`), que crean y migran ellas mismas,
 | `port is already allocated` | El puerto `8080` o `5433` está ocupado. Cambia `WEB_PORT` o `DB_PORT` en `.env`. |
 | Registrarse o votar devuelve **403** | Abriste la app en una dirección que no está en `APP_ORIGIN` (por ejemplo `http://127.0.0.1:8080`, o cambiaste `WEB_PORT`). Añádela a `APP_ORIGIN` y ejecuta de nuevo `docker compose up -d`. |
 | «No pudimos cargar los mapas de VALORANT…» | La API no pudo descargar el catálogo de Valorant API (sin internet o servicio caído). Pulsa Reintentar cuando vuelva la conexión. |
-| «Ese dominio de correo no existe o no recibe emails» | El dominio del email no tiene servidor de correo. Usa un email real. |
+| «Ese dominio de correo no existe o no recibe emails» | El dominio del email no existe en el DNS. Usa un email real. |
 | `Cannot connect to the Docker daemon` | Docker Desktop no está abierto. |
 
 ## Estructura
@@ -148,7 +148,7 @@ Desarrollado con Claude Code y agentes con un reparto explícito: yo tomé las d
 
 - Revocación de sesiones en el servidor: cerrar sesión borra la cookie, pero un token copiado sigue siendo válido hasta que caduca (7 días).
 - Límite de intentos de inicio de sesión.
-- Verificación del email por correo: se comprueba el formato y que el dominio reciba correo, no que el buzón exista.
+- Verificación del email por correo: se comprueba el formato y que el dominio exista, no que el buzón exista.
 - Retirar un voto.
 - Agrupar los agentes por rol en el selector.
 - Conservar el agente que eligió un visitante después de iniciar sesión (vuelve al mapa, pero tiene que elegirlo de nuevo).

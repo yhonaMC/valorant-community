@@ -30,17 +30,28 @@ async function verifyPassword(password: string, stored: string) {
   return timingSafeEqual(actual, expected);
 }
 
-// El dominio del email debe existir y aceptar correo (registro MX que no sea el «MX nulo» de RFC 7505).
-// Si el DNS no responde (sin red, timeout) no se bloquea el registro: solo se rechaza lo que el DNS niega.
+// El dominio del email debe existir. Solo se rechaza con certeza: el dominio no existe (ni MX ni A,
+// en todos los intentos) o declara que no recibe correo («MX nulo», RFC 7505). Ante cualquier duda
+// (sin red, timeout, respuesta vacía) se acepta: rechazar a un usuario real es peor que aceptar un dominio falso.
+// Los reintentos existen porque el DNS interno de Docker falla de forma intermitente en la primera
+// consulta de un dominio (medido: ENOTFOUND/ENODATA para gmail.com u outlook.com, y bien 400 ms después).
 // ponytail: no comprueba que exista el buzón; eso exige enviar un correo de verificación.
 const resolver = new Resolver({ timeout: 3000, tries: 1 });
+const DNS_ATTEMPTS = 3;
+const DNS_RETRY_MS = 400;
+const dnsCode = (e: unknown) => (e as NodeJS.ErrnoException).code;
+
 async function domainAcceptsMail(email: string) {
-  try {
-    const mx = await resolver.resolveMx(email.slice(email.lastIndexOf('@') + 1));
-    return mx.some((r) => r.exchange !== '' && r.exchange !== '.');
-  } catch (e) {
-    const code = (e as NodeJS.ErrnoException).code;
-    return code !== 'ENOTFOUND' && code !== 'ENODATA';
+  const domain = email.slice(email.lastIndexOf('@') + 1);
+  for (let attempt = 1; ; attempt++) {
+    const [mx, a] = await Promise.allSettled([resolver.resolveMx(domain), resolver.resolve4(domain)]);
+    if (mx.status === 'fulfilled' && mx.value.length) {
+      return mx.value.some((r) => r.exchange !== '' && r.exchange !== '.');
+    }
+    const missing = (r: PromiseSettledResult<unknown>) => r.status === 'rejected' && dnsCode(r.reason) === 'ENOTFOUND';
+    if (!missing(mx) || !missing(a)) return true;
+    if (attempt === DNS_ATTEMPTS) return false;
+    await new Promise((r) => setTimeout(r, DNS_RETRY_MS));
   }
 }
 
