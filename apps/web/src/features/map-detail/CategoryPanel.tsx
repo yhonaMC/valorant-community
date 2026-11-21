@@ -136,13 +136,6 @@ function MyVote({
           // imagen anterior: nunca se ve el agente previo junto al nombre nuevo.
           <div className={option ? styles.bust : `${styles.bust} ${styles.empty}`}>
             {option?.portrait && <img key={option.id} src={option.portrait} alt="" width={2048} height={1860} />}
-            {/* Rótulo vertical decorativo; el nombre y el rol legibles están al lado. */}
-            {option && (
-              <span className={styles.vertical} aria-hidden="true">
-                <span className={styles.verticalName}>{option.name}</span>
-                <span className={styles.verticalRole}>{option.detail}</span>
-              </span>
-            )}
           </div>
         ) : option?.icon ? (
           <img key={option.id} className={styles.silhouette} src={option.icon} alt="" width={120} height={32} />

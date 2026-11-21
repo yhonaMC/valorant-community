@@ -53,7 +53,7 @@
 }
 
 /* Ficha: tarjeta alta con el agente en grande (fullPortrait, 2048×1860), de la cabeza a
-   medio muslo, y su nombre en vertical con solo el contorno, como un cromo de jugador. */
+   medio muslo, como un cromo de jugador. El nombre y el rol van al lado, una sola vez. */
 .bust {
   position: relative;
   flex-shrink: 0;
@@ -79,35 +79,6 @@
   /* La figura ocupa el centro de la imagen, con margen vacío arriba: se acerca desde la cabeza. */
   transform: scale(1.8);
   transform-origin: 54% 16%;
-}
-
-.vertical {
-  position: absolute;
-  top: 10px;
-  left: 6px;
-  writing-mode: vertical-rl;
-  white-space: nowrap;
-  pointer-events: none;
-}
-
-.verticalName {
-  font-family: var(--font-display);
-  font-size: 2.75rem;
-  line-height: 1;
-  text-transform: uppercase;
-  white-space: nowrap;
-  color: transparent;
-  -webkit-text-stroke: 1px rgb(236 232 225 / 0.85);
-}
-
-.verticalRole {
-  color: var(--accent);
-  font-size: 0.75rem;
-  font-weight: 600;
-  /* Sigue al nombre en la misma línea vertical, centrado en su ancho. */
-  margin-block-start: 0;
-  margin-inline-start: 10px;
-  vertical-align: middle;
 }
 
 .silhouette {
