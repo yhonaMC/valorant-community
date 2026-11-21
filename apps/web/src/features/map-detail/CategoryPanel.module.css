@@ -52,13 +52,13 @@
   gap: 20px;
 }
 
-/* Ficha: el rostro del agente (icon, cuadrado, ya en caché por la rejilla) recortado
-   a 3:4, como una foto de ficha deportiva: cabeza y hombros. */
+/* Ficha: el agente de cuerpo entero (fullPortrait, 2048×1860) en un marco 3:4, como un
+   cromo. Con «cover» se recortan solo los márgenes laterales vacíos de la imagen. */
 .bust {
   flex-shrink: 0;
   overflow: hidden;
-  width: 120px;
-  height: 160px;
+  width: 150px;
+  height: 200px;
   border: 2px solid var(--accent);
   border-radius: var(--radius);
   background: var(--surface-1);
@@ -68,7 +68,10 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center top;
+  object-position: center;
+  /* La figura ocupa el centro-bajo de la imagen (margen vacío arriba): se acerca desde los pies. */
+  transform: scale(1.13);
+  transform-origin: 54% 100%;
 }
 
 .silhouette {

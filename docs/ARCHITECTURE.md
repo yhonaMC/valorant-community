@@ -71,7 +71,7 @@ Los errores siempre tienen la forma `{ statusCode, message, fields? }`, en espa�
 - Se descargan `maps`, `agents?isPlayableCharacter=true` y `weapons` en español, con un tiempo máximo de 5 s, y se recortan a lo que pinta la interfaz. La respuesta de armas pesa unos 3,6 MB por las skins y nunca llega al navegador.
 - **Mapas competitivos:** la API no los marca. Son los únicos con `tacticalDescription` (13); se excluyen The Range, Skirmish y los de Team Deathmatch.
 - **Armas:** se excluye el cuerpo a cuerpo (sin `shopData`). La categoría se etiqueta por categoría de tienda: en español, Warden traía «Rifles» y el resto de su categoría «Rifles de asalto».
-- **Imágenes de agente:** `killfeedPortrait` (~28 KB) en la rejilla y `displayIcon` (1024 px) solo en la ficha «Tu voto». Con `displayIcon` en la rejilla, la página descargaba 12 MB.
+- **Imágenes de agente:** `killfeedPortrait` (256×128, ~28 KB) en la rejilla de 30 y `fullPortrait` (cuerpo entero, ~600 KB) solo en la ficha «Tu voto», donde se carga uno a la vez. Con retratos grandes en la rejilla, la página descargaba 12 MB.
 - **Caché en memoria de 1 h.** Una sola descarga en curso a la vez. Si una renovación falla, o devuelve listas vacías por un cambio de formato, se sigue sirviendo la caché anterior. Solo si nunca se cargó se responde 503 y la interfaz muestra «No pudimos cargar los mapas de VALORANT…» con Reintentar.
 - Los identificadores del voto se validan contra esa caché: no se puede votar un mapa no competitivo, un arma como agente ni un uuid inventado.
 

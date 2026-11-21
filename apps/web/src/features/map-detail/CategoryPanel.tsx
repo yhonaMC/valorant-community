@@ -132,10 +132,10 @@ function MyVote({
       <p className={styles.myVoteHead}>Tu voto</p>
       <div className={agent ? styles.card : styles.weaponCard}>
         {agent ? (
-          // Rostro grande (portrait), precargado al votar. La key evita reutilizar la
+          // Cuerpo entero (portrait), precargado al votar. La key evita reutilizar la
           // imagen anterior: nunca se ve el agente previo junto al nombre nuevo.
           <div className={option ? styles.bust : `${styles.bust} ${styles.empty}`}>
-            {option?.portrait && <img key={option.id} src={option.portrait} alt="" width={1024} height={1024} />}
+            {option?.portrait && <img key={option.id} src={option.portrait} alt="" width={2048} height={1860} />}
           </div>
         ) : option?.icon ? (
           <img key={option.id} className={styles.silhouette} src={option.icon} alt="" width={120} height={32} />
