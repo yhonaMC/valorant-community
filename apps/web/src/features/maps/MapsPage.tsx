@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react';
+import type { CSSProperties, PointerEvent } from 'react';
 import { Link } from 'react-router';
 import { useCatalog } from '../../api/queries';
 import { CatalogError } from './CatalogError';
@@ -11,20 +11,44 @@ export function MapsPage() {
   const catalog = useCatalog();
   const maps = catalog.data ? [...catalog.data.maps].sort((a, b) => a.name.localeCompare(b.name, 'es')) : [];
 
+  // La rejilla del fondo se ilumina alrededor del cursor (solo ratón).
+  function trackPointer(e: PointerEvent<HTMLDivElement>) {
+    if (e.pointerType !== 'mouse') return;
+    const box = e.currentTarget.getBoundingClientRect();
+    e.currentTarget.style.setProperty('--mx', `${e.clientX - box.left}px`);
+    e.currentTarget.style.setProperty('--my', `${e.clientY - box.top}px`);
+  }
+
+  // «Glitch» breve del título al entrar con el ratón; no se dispara con movimiento reducido.
+  function glitch(e: PointerEvent<HTMLSpanElement>) {
+    if (e.pointerType !== 'mouse' || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const el = e.currentTarget;
+    el.classList.remove(styles.glitch);
+    void el.offsetWidth; // reinicia la animación
+    el.classList.add(styles.glitch);
+    setTimeout(() => el.classList.remove(styles.glitch), 400);
+  }
+
   return (
     <div className={styles.page}>
       <title>Mapas · Valorant Community</title>
-      <div className={styles.intro}>
+      <div
+        className={styles.intro}
+        onPointerMove={trackPointer}
+        onPointerLeave={(e) => e.currentTarget.style.removeProperty('--mx')}
+      >
         {/* Fondo: bloques inclinados que derivan despacio (decorativo). */}
         <div className={styles.fx} aria-hidden="true">
+          <span className={styles.dots} />
+          <span className={styles.dotsLit} />
           <span className={styles.shardA} />
           <span className={styles.shardB} />
           <span className={styles.shardC} />
         </div>
         <div>
           <h1 className={styles.title} id="mapas-titulo">
-            <span className={styles.wipe}>
-              <span>Mapas</span>
+            <span className={styles.wipe} onPointerEnter={glitch}>
+              <span data-text="Mapas">Mapas</span>
             </span>
           </h1>
           <p className={styles.lede}>Elige un mapa para votar tu mejor agente y tu mejor arma, y ver qué prefiere la comunidad.</p>
