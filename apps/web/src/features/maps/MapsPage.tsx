@@ -14,18 +14,23 @@ export function MapsPage() {
     <div className={styles.page}>
       <title>Mapas · Valorant Community</title>
       <div className={styles.intro}>
-        <h1 className={styles.title} id="mapas-titulo">
-          Mapas
-        </h1>
-        {/* Título y texto forman un solo grupo; las cifras son las reales del catálogo. */}
-        <p className={styles.lede}>
-          {catalog.data && (
-            <strong className={styles.counts}>
-              {catalog.data.maps.length} mapas, {catalog.data.agents.length} agentes y {catalog.data.weapons.length} armas.
-            </strong>
-          )}
-          Elige un mapa, vota tu mejor agente y tu mejor arma, y mira qué prefiere la comunidad.
-        </p>
+        <div>
+          <h1 className={styles.title} id="mapas-titulo">
+            Mapas
+          </h1>
+          <p className={styles.lede}>Elige un mapa para votar tu mejor agente y tu mejor arma, y ver qué prefiere la comunidad.</p>
+        </div>
+        {/* Qué hay para votar, con las cifras reales del catálogo. Mientras carga, guiones (sin salto de diseño). */}
+        {!catalog.isError && (
+          <ul className={styles.stats} aria-label="Qué puedes votar">
+            {(['maps', 'agents', 'weapons'] as const).map((key) => (
+              <li key={key} className={styles.stat}>
+                <strong className={styles.statNum}>{catalog.data ? catalog.data[key].length : '–'}</strong>
+                {{ maps: 'mapas', agents: 'agentes', weapons: 'armas' }[key]}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
       {catalog.isError ? (

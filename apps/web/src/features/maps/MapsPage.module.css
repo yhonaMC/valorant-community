@@ -1,34 +1,87 @@
 .page {
-  padding: 48px var(--gutter) 0;
+  padding: 56px var(--gutter) 0;
 }
 
-/* Título y texto son un solo grupo, juntos a la izquierda y apoyados en la misma
-   línea base: la banda mide lo que mide el título, sin media pantalla vacía. */
+/* Título a la izquierda y cifras del catálogo a la derecha, apoyados en la misma base:
+   la banda ocupa todo el ancho en vez de dejar medio encabezado vacío. */
 .intro {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
-  align-items: last baseline;
-  gap: 12px 32px;
-  margin-bottom: 28px;
+  justify-content: space-between;
+  gap: 24px 48px;
+  margin-bottom: 40px;
 }
 
 .title {
-  font-size: clamp(3rem, 8vw, 5.5rem);
-  line-height: 0.9;
+  font-size: clamp(3.5rem, 11vw, 8rem);
 }
 
 .lede {
-  max-width: 46ch;
-  margin: 0;
+  max-width: 44ch;
+  margin: 16px 0 0;
   color: var(--text-muted);
+  font-size: 1.0625rem;
   text-wrap: pretty;
 }
 
-.counts {
-  display: block;
+.stats {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 5.5rem;
+  padding: 0 24px;
+  border-left: 1px solid var(--surface-2);
+  color: var(--text-muted);
+  font-size: 0.9375rem;
+}
+
+.stat:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.stat:last-child {
+  padding-right: 0;
+}
+
+.statNum {
   color: var(--text);
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2.25rem, 5vw, 3.5rem);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Desde 720px las cifras quedan a la derecha, centradas en vertical con el título
+   (no con el bloque título + texto). */
+@media (min-width: 720px) {
+  .intro {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 0 48px;
+  }
+
+  .intro > div {
+    display: contents;
+  }
+
+  .stats {
+    grid-area: 1 / 2;
+  }
+
+  .lede {
+    grid-area: 2 / 1 / auto / -1;
+  }
 }
 
 .grid {
