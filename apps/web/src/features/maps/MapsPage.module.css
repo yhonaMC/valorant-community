@@ -231,3 +231,200 @@
   margin-top: 2px;
   color: var(--error);
 }
+
+/* ── Animaciones de portada, adaptadas de valorant-api.com ─────────────────────────── */
+
+/* 1. Revelado: una barra roja barre el texto de izquierda a derecha y lo deja a la vista.
+   --i escalona título y cifras. */
+.wipe {
+  position: relative;
+  display: block;
+  width: fit-content;
+}
+
+.wipe::after {
+  content: '';
+  position: absolute;
+  inset: 0.05em -0.06em 0.02em;
+  background: var(--accent);
+  transform: scaleX(0);
+  pointer-events: none;
+  animation: wipe 760ms var(--ease-out) calc(80ms + var(--i, 0) * 120ms) both;
+}
+
+.wipe > span {
+  display: inline-block;
+  animation: wipe-show 760ms steps(1) calc(80ms + var(--i, 0) * 120ms) both;
+}
+
+@keyframes wipe {
+  0% {
+    transform-origin: left;
+    transform: scaleX(0);
+  }
+  48% {
+    transform-origin: left;
+    transform: scaleX(1);
+  }
+  52% {
+    transform-origin: right;
+    transform: scaleX(1);
+  }
+  100% {
+    transform-origin: right;
+    transform: scaleX(0);
+  }
+}
+
+@keyframes wipe-show {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* 2. Fondo: bloques inclinados, casi transparentes, que derivan muy despacio.
+   La banda se extiende hasta los bordes de la página para que no se corten en el margen. */
+.intro {
+  position: relative;
+  isolation: isolate;
+  margin-inline: calc(-1 * var(--gutter));
+  margin-top: -56px;
+  padding: 56px var(--gutter) 0;
+}
+
+.fx {
+  position: absolute;
+  inset: 0 0 -40px;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.shardA,
+.shardB,
+.shardC {
+  position: absolute;
+  background: var(--accent);
+  clip-path: polygon(30% 0, 100% 0, 70% 100%, 0 100%);
+}
+
+.shardA {
+  top: -10%;
+  right: -4%;
+  width: clamp(220px, 28vw, 420px);
+  height: 120%;
+  opacity: 0.07;
+  animation: drift 22s ease-in-out infinite alternate;
+}
+
+.shardB {
+  right: 34%;
+  bottom: -12%;
+  width: clamp(90px, 11vw, 160px);
+  height: 45%;
+  opacity: 0.1;
+  animation: drift 17s ease-in-out infinite alternate-reverse;
+}
+
+.shardC {
+  top: 10%;
+  right: 10%;
+  width: 60px;
+  height: 140px;
+  background: none;
+  clip-path: none;
+  box-shadow: inset 0 0 0 1px rgb(236 232 225 / 0.22);
+  transform: skew(-24deg);
+  animation: drift-outline 13s ease-in-out infinite alternate;
+}
+
+@keyframes drift {
+  to {
+    transform: translate(-40px, 24px);
+  }
+}
+
+@keyframes drift-outline {
+  from {
+    transform: skew(-24deg) translate(0);
+  }
+  to {
+    transform: skew(-24deg) translate(-30px, 40px);
+  }
+}
+
+/* 3. Mapas: cuatro esquinas tipo mira que se cierran sobre la tarjeta (ratón y teclado). */
+.corners {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.corners i {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border: 0 solid var(--text);
+  opacity: 0;
+  transition:
+    opacity 140ms var(--ease-out),
+    transform 220ms var(--ease-out);
+}
+
+.corners i:nth-child(1) {
+  top: 10px;
+  left: 10px;
+  border-top-width: 2px;
+  border-left-width: 2px;
+  transform: translate(-10px, -10px);
+}
+
+.corners i:nth-child(2) {
+  top: 10px;
+  right: 10px;
+  border-top-width: 2px;
+  border-right-width: 2px;
+  transform: translate(10px, -10px);
+}
+
+.corners i:nth-child(3) {
+  bottom: 10px;
+  left: 10px;
+  border-bottom-width: 2px;
+  border-left-width: 2px;
+  transform: translate(-10px, 10px);
+}
+
+.corners i:nth-child(4) {
+  right: 10px;
+  bottom: 10px;
+  border-right-width: 2px;
+  border-bottom-width: 2px;
+  transform: translate(10px, 10px);
+}
+
+.link:hover .corners i,
+.link:focus-visible .corners i {
+  opacity: 1;
+  transform: none;
+}
+
+/* Movimiento reducido: sin deriva infinita ni barrido; todo visible desde el principio. */
+@media (prefers-reduced-motion: reduce) {
+  .shardA,
+  .shardB,
+  .shardC,
+  .wipe::after,
+  .wipe > span {
+    animation: none;
+  }
+}
+
+/* La regla «.intro > div { display: contents }» de 720px no debe alcanzar al fondo:
+   sin caja propia dejaría de recortar los bloques. */
+.intro > .fx {
+  display: block;
+}

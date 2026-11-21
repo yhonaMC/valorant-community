@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { Link } from 'react-router';
 import { useCatalog } from '../../api/queries';
 import { CatalogError } from './CatalogError';
@@ -14,18 +15,28 @@ export function MapsPage() {
     <div className={styles.page}>
       <title>Mapas · Valorant Community</title>
       <div className={styles.intro}>
+        {/* Fondo: bloques inclinados que derivan despacio (decorativo). */}
+        <div className={styles.fx} aria-hidden="true">
+          <span className={styles.shardA} />
+          <span className={styles.shardB} />
+          <span className={styles.shardC} />
+        </div>
         <div>
           <h1 className={styles.title} id="mapas-titulo">
-            Mapas
+            <span className={styles.wipe}>
+              <span>Mapas</span>
+            </span>
           </h1>
           <p className={styles.lede}>Elige un mapa para votar tu mejor agente y tu mejor arma, y ver qué prefiere la comunidad.</p>
         </div>
         {/* Qué hay para votar, con las cifras reales del catálogo. Mientras carga, guiones (sin salto de diseño). */}
         {!catalog.isError && (
           <ul className={styles.stats} aria-label="Qué puedes votar">
-            {(['maps', 'agents', 'weapons'] as const).map((key) => (
+            {(['maps', 'agents', 'weapons'] as const).map((key, i) => (
               <li key={key} className={styles.stat}>
-                <strong className={styles.statNum}>{catalog.data ? catalog.data[key].length : '–'}</strong>
+                <strong className={`${styles.statNum} ${styles.wipe}`} style={{ '--i': i + 1 } as CSSProperties}>
+                  <span>{catalog.data ? catalog.data[key].length : '–'}</span>
+                </strong>
                 {{ maps: 'mapas', agents: 'agentes', weapons: 'armas' }[key]}
               </li>
             ))}
@@ -69,6 +80,10 @@ export function MapsPage() {
                     />
                   </picture>
                 </div>
+                {/* Esquinas tipo mira que se cierran sobre el mapa al pasar el ratón o enfocar. */}
+                <span className={styles.corners} aria-hidden="true">
+                  <i /><i /><i /><i />
+                </span>
                 <span className={styles.label}>
                   <span className={styles.name}>{map.name}</span>
                   <span className={styles.enter} aria-hidden="true">
