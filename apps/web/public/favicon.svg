@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Marca de voto en el rojo de la paleta: una «V» que es también una casilla marcada. No es el logotipo de Riot. -->
+  <rect width="32" height="32" rx="6" fill="#ff4655"/>
+  <path d="M5.5 7.5h5.7l4.8 10.4 4.8-10.4h5.7L18.9 24.5h-5.8z" fill="#0f1923"/>
+</svg>
